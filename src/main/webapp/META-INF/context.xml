@@ -1,0 +1,16 @@
+<!-- context.xml under: /src/main/webapp/META-INF/ OR /WEB-INF/ depending on your IDE -->
+<Context>
+  
+<Resource name="jdbc/item"
+          auth="Container"
+          type="javax.sql.DataSource"
+          factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+          driverClassName="oracle.jdbc.OracleDriver"
+          url="jdbc:oracle:thin:@localhost:1521/XEPDB1"
+          username="hr"
+          password="hr"
+          maxTotal="20"
+          maxIdle="10"
+          maxWaitMillis="-1"/>
+
+</Context>
