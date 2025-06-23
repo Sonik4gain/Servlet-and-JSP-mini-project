@@ -1,4 +1,4 @@
-package com.item.model;
+package com.item.controller;
 
 import com.item.dao.ItemDetailsDaoImpl;
 import com.item.model.ItemDetails;
@@ -22,6 +22,7 @@ public class AddItemDetailsServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+    	System.out.println("DOPOST REACHED");
 
         int itemId = Integer.parseInt(request.getParameter("itemId"));
         String description = request.getParameter("description");
