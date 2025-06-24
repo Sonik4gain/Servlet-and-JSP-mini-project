@@ -45,7 +45,7 @@ public class ItemDetailsDaoImpl implements ItemDetailsDao {
 
             stmt.executeUpdate();                                   // Run the query
         } catch (SQLException e) {
-            e.printStackTrace(); // You can log this properly later
+        	System.err.println("SQL Error in saveItemDetails: " + e.getMessage());
         }
     }
 

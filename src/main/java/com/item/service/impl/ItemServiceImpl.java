@@ -10,11 +10,14 @@ import java.util.Objects;
 
 import javax.sql.DataSource;
 
+import com.item.dao.ItemDetailsDao;
 import com.item.model.Item;
 import com.item.service.ItemService;
 
 public class ItemServiceImpl implements ItemService {
 
+	
+	
 	private DataSource dataSource;
 	
 	public ItemServiceImpl(DataSource dataSource) {
@@ -112,31 +115,32 @@ public class ItemServiceImpl implements ItemService {
 
 	@Override
 	public List<Item> loadItems() {
-		try {
-			Connection connection =  dataSource.getConnection();
-			String query = "SELECT * FROM item order by id";
-			Statement statement = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery(query);
-			
-			List<Item> items = new ArrayList<Item>();
-			
-			while (resultSet.next()) {
-				Item item = new Item(
-						resultSet.getInt("id"),
-						resultSet.getString("Name"),
-						resultSet.getDouble("price"),
-						resultSet.getInt("total_number")
-				);
-				items.add(item);
-			}
-			
-			return items;
-			
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-		}
-		return null;
-	}
+	    try {
+	        Connection connection =  dataSource.getConnection();
+	        String query = "SELECT i.id, i.name, i.price, i.total_number, d.description " +
+	                       "FROM item i LEFT JOIN item_details d ON i.id = d.item_id ORDER BY i.id";
+	        Statement statement = connection.createStatement();
+	        ResultSet resultSet = statement.executeQuery(query);
 
+	        List<Item> items = new ArrayList<>();
+
+	        while (resultSet.next()) {
+	            Item item = new Item(
+	                resultSet.getInt("id"),
+	                resultSet.getString("name"),
+	                resultSet.getDouble("price"), 
+	                resultSet.getInt("total_number"), // as in table
+	                resultSet.getString("description") // may be null or .. empty
+	            );
+	            items.add(item);
+	        }
+
+	        return items;
+
+	    } catch (SQLException e) {
+	        System.out.println(e.getMessage());
+	    }
+	    return null;
+	}
 
 }

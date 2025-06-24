@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 
 import com.item.model.Item;
+import com.item.model.ItemDetails;
 import com.item.service.ItemService;
 import com.item.service.impl.ItemServiceImpl;
 
@@ -85,17 +86,19 @@ public class ItemController extends HttpServlet {
 
 
 	private void loadItems(HttpServletRequest request, HttpServletResponse response) {
-		// TODO Auto-generated method stub
-		
-		List<Item> items =  itemService.loadItems();
-		
-		request.setAttribute("itemsData", items);
-		try {
-			request.getRequestDispatcher("/load-items.jsp").forward(request, response);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
+	    List<Item> items = itemService.loadItems();
+	    List<ItemDetails> itemDetails = itemService.getAllItemDetails(); // أضف دي
+
+	    request.setAttribute("itemsData", items);
+	    request.setAttribute("itemDetailsData", itemDetails); // وأضف دي كمان
+
+	    try {
+	        request.getRequestDispatcher("/load-items.jsp").forward(request, response);
+	    } catch (Exception e) {
+	        System.out.println(e.getMessage());
+	    }
 	}
+
 
 	private void loadItem(HttpServletRequest request, HttpServletResponse response) {
 		// TODO Auto-generated method stub

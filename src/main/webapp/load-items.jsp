@@ -27,9 +27,8 @@
         <tbody>
         <%
         List<Item> items = (List<Item>) request.getAttribute("itemsData");
-        %>
-        <%
-        	for(Item item: items){
+        if (items != null) {
+            for(Item item: items){
         %>
         <tr>
             <td><strong><%=item.getId() %></strong></td>
@@ -39,20 +38,23 @@
             <td>
                 <a href='ItemController?action=load-item&id=<%=item.getId() %>'>Update</a>
                 <a href='ItemController?action=remove-item&id=<%=item.getId() %>'>Delete</a>
+                <%
+                    if (item.getDescription() == null || item.getDescription().trim().isEmpty()) {
+                %>
+                    <a href="ItemDetailsController?action=show-add-form&itemId=<%=item.getId() %>">Add Description</a>
+                <%
+                    }
+                %>
             </td>
         </tr>
         <%
-        	}
+            }
+        }
         %>
-        
         </tbody>
     </table>
 
-
     <button class="f"><a href="add-item.html">Add Item</a></button>
-
-
 </div>
-
 </body>
 </html>
