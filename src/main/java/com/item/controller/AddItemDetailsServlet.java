@@ -27,7 +27,7 @@ public class AddItemDetailsServlet extends HttpServlet {
         int itemId = Integer.parseInt(request.getParameter("itemId"));
         String description = request.getParameter("description");
 
-        // Check if item already has details
+        // Check if the item already has details
         List<ItemDetails> existing = itemDetailsDao.getItemDetailsByItemId(itemId);
 
         if (existing.isEmpty()) {

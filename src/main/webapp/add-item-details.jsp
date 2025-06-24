@@ -13,7 +13,7 @@
     <input type="number" name="itemId" id="itemId" required />
 
     <label for="description">Description:</label>
-    <textarea name="description" id="description" required></textarea>
+    <textarea name="description" id="description" required></textarea> 
 
     <button type="submit">Add Details</button>
 </form>
