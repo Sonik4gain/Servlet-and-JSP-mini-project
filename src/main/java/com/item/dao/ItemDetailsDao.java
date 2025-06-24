@@ -10,4 +10,5 @@ public interface ItemDetailsDao {
 
     // Get all details that match a specific itemId (foreign key)
     List<ItemDetails> getItemDetailsByItemId(int itemId);
+    
 }

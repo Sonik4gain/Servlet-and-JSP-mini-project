@@ -1,12 +1,13 @@
-package com.item.service.impl;
+package com.item.controller;
 
-import com.item.service.impl.ItemDetailsService;
 import javax.annotation.Resource;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import javax.sql.DataSource;
 import java.io.IOException;
+import com.item.service.ItemDetailsService;
+import com.item.service.impl.ItemDetailsServiceImpl;
 
 @WebServlet("/ItemDetailsController")
 public class ItemDetailsController extends HttpServlet {
@@ -18,8 +19,9 @@ public class ItemDetailsController extends HttpServlet {
 
     @Override
     public void init() {
-        itemDetailsService = new ItemDetailsService(dataSource);
+        itemDetailsService = new ItemDetailsServiceImpl(dataSource);
     }
+
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

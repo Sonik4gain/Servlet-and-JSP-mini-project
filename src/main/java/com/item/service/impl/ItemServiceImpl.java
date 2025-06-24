@@ -10,20 +10,24 @@ import java.util.Objects;
 
 import javax.sql.DataSource;
 
+import com.item.dao.ItemDAO;
 import com.item.dao.ItemDetailsDao;
 import com.item.model.Item;
+import com.item.model.ItemDetails;
 import com.item.service.ItemService;
 
 public class ItemServiceImpl implements ItemService {
 
-	
-	
 	private DataSource dataSource;
-	
+	private ItemDAO itemDAO;
+
 	public ItemServiceImpl(DataSource dataSource) {
 		this.dataSource = dataSource;
+		 itemDAO = new ItemDAO(dataSource);
 	}
 	
+	
+
 	//preStat
 	@Override
 	public boolean saveItem(Item item) {
@@ -45,6 +49,7 @@ public class ItemServiceImpl implements ItemService {
 		return false;
 	}
 
+	
 	@Override
 	public boolean removeItem(int id) {
 		try {
@@ -87,7 +92,11 @@ public class ItemServiceImpl implements ItemService {
 
 	    return false;
 	}
-
+	
+	@Override
+	public List<ItemDetails> getAllItemDetails() {
+	    return itemDAO.getAllItemDetails();  // added this after the item data access object .java file    
+	}
 
 	@Override
 	public Item loadItem(int id) {
@@ -112,7 +121,7 @@ public class ItemServiceImpl implements ItemService {
 		}
 		return null;
 	}
-
+	
 	@Override
 	public List<Item> loadItems() {
 	    try {
