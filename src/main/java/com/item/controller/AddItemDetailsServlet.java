@@ -2,10 +2,11 @@ package com.item.controller;
 
 import com.item.dao.ItemDetailsDaoImpl;
 import com.item.model.ItemDetails;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
@@ -16,33 +17,44 @@ public class AddItemDetailsServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        itemDetailsDao = new ItemDetailsDaoImpl();  // DAO ready
+        itemDetailsDao = new ItemDetailsDaoImpl();
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-    	System.out.println("DOPOST REACHED");
+        System.out.println("DOPOST REACHED");
 
-        int itemId = Integer.parseInt(request.getParameter("itemId"));
-        String description = request.getParameter("description");
+        // Added some proper error handling for parsing itemId
+        try {
+            int itemId = Integer.parseInt(request.getParameter("itemId"));
+            String description = request.getParameter("description");
+            
+            // FIXED: Added null check for description parameter
+            if (description == null || description.trim().isEmpty()) {
+                response.sendRedirect("add-item-details.jsp?error=empty_description&itemId=" + itemId);
+                return;
+            }
 
-        // Check if the item already has details
-        List<ItemDetails> existing = itemDetailsDao.getItemDetailsByItemId(itemId);
+            List<ItemDetails> existing = itemDetailsDao.getItemDetailsByItemId(itemId);
 
-        if (existing.isEmpty()) {
-            // No existing details → insert
-            ItemDetails details = new ItemDetails();
-            details.setItemId(itemId);
-            details.setDescription(description);
-
-            itemDetailsDao.saveItemDetails(details);
-
-            // Redirect to success page (or show)
-            response.sendRedirect("show-item-details.jsp?itemId=" + itemId);
-        } else {
-            // Already exists → redirect with error
-            response.sendRedirect("add-item-details.jsp?error=exists");
+            if (existing.isEmpty()) {
+                ItemDetails details = new ItemDetails();
+                details.setItemId(itemId);
+                details.setDescription(description.trim()); // FIXED: Trim whitespace
+                itemDetailsDao.saveItemDetails(details);
+                
+                //  Changed redirect to use ItemController to show updated list
+                response.sendRedirect("ItemController?action=load-items");
+            } else {
+                // redirect back with error message 
+                response.sendRedirect("add-item-details.jsp?error=exists&itemId=" + itemId);
+            }
+            
+        } catch (NumberFormatException e) {
+            //  Added error handling for invalid itemId
+            System.err.println("Invalid itemId parameter: " + e.getMessage());
+            response.sendRedirect("ItemController?action=load-items&error=invalid_id");
         }
     }
 }

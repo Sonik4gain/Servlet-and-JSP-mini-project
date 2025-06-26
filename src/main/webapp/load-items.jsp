@@ -21,6 +21,7 @@
             <th>NAME</th>
             <th>PRICE</th>
             <th>TOTAL_NUMBER</th>
+            <th>DESCRIPTION</th>
             <th>Action</th>
         </tr>
         </thead>
@@ -36,12 +37,34 @@
             <td><%=item.getPrice() %></td>
             <td><%=item.getTotalNumber()%></td>
             <td>
-                <a href='ItemController?action=load-item&id=<%=item.getId() %>'>Update</a>
+                <!-- ADDED: Show description if exists, otherwise show "No Description" -->
+                <%
+                    if (item.getDescription() != null && !item.getDescription().trim().isEmpty()) {
+                %>
+                    <%=item.getDescription().substring(0, Math.min(item.getDescription().length(), 50))%>
+                    <% if (item.getDescription().length() > 50) { %>...<%}%>
+                <%
+                    } else {
+                %>
+                    <em>No Description</em>
+                <%
+                    }
+                %>
+            </td>
+            <td>
+                <a href='ItemController?action=update-item-form&id=<%=item.getId() %>'>Update</a>
                 <a href='ItemController?action=remove-item&id=<%=item.getId() %>'>Delete</a>
+                
+                <!-- TASK 1 & 2: Add "Add Description" action only if item has no existing details -->
                 <%
                     if (item.getDescription() == null || item.getDescription().trim().isEmpty()) {
                 %>
                     <a href="ItemDetailsController?action=show-add-form&itemId=<%=item.getId() %>">Add Description</a>
+                <%
+                    } else {
+                        // TASK 3: Add "View Details" action to redirect to show-item-details.jsp
+                %>
+                    <a href="ItemController?action=show-details&id=<%=item.getId() %>">View Details</a>
                 <%
                     }
                 %>

@@ -1,174 +1,151 @@
 package com.item.service.impl;
-import java.sql.PreparedStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+
+import com.item.dao.ItemDAO;
+import com.item.model.Item;
+import com.item.model.ItemDetails;
+import com.item.service.ItemService;
+import javax.sql.DataSource;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.sql.DataSource;
-
-import com.item.dao.ItemDAO;
-import com.item.dao.ItemDetailsDao;
-import com.item.model.Item;
-import com.item.model.ItemDetails;
-import com.item.service.ItemService;
-
 public class ItemServiceImpl implements ItemService {
 
-	private DataSource dataSource;
-	private ItemDAO itemDAO;
+    private DataSource dataSource;
+    private ItemDAO itemDAO;
 
-	public ItemServiceImpl(DataSource dataSource) {
-		this.dataSource = dataSource;
-		 itemDAO = new ItemDAO(dataSource);
-	}
-	
-	
+    public ItemServiceImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
+        this.itemDAO = new ItemDAO(dataSource);
+    }
+    
+    @Override
+    public Integer saveItemAndReturnId(Item item) {
+        // Added try-with-resources for proper connection management
+        String query = "INSERT INTO item (NAME,PRICE,TOTAL_NUMBER) VALUES (?, ?, ?)";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+            
+            stmt.setString(1, item.getName());
+            stmt.setDouble(2, item.getPrice());
+            stmt.setInt(3, item.getTotalNumber());
 
-	//preStat i will change this from boolean, to int maybe.. it was :public boolean saveItem(Item item){
-	/*
-	 * @Override public boolean saveItem(Item item) { try { Connection connection =
-	 * dataSource.getConnection();
-	 * 
-	 * String query = "INSERT INTO item (NAME,PRICE,TOTAL_NUMBER)" + " VALUES ('" +
-	 * item.getName() + "', " + item.getPrice() +", " + item.getTotalNumber() + ")";
-	 * Statement statement = connection.createStatement(); int res =
-	 * statement.executeUpdate(query);
-	 * 
-	 * System.out.println(res);
-	 * 
-	 * return res == 1; } catch (SQLException e) {
-	 * System.out.println(e.getMessage()); } return false; }
-	 */
-// new code : 
-	public Integer saveItemAndReturnId(Item item) {
-	    try {
-	        Connection connection = dataSource.getConnection();
+            int res = stmt.executeUpdate();
 
-	        String query = "INSERT INTO item (NAME,PRICE,TOTAL_NUMBER) VALUES (?, ?, ?)";
-	        PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-	        stmt.setString(1, item.getName());
-	        stmt.setDouble(2, item.getPrice());
-	        stmt.setInt(3, item.getTotalNumber());
+            if (res == 1) {
+                try (ResultSet rs = stmt.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        return rs.getInt(1);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error saving item: " + e.getMessage());
+        }
+        return null;
+    }
 
-	        int res = stmt.executeUpdate();
+    @Override
+    public boolean removeItem(int id) {
+        //  Used PreparedStatement instead of Statement to prevent SQL injection hackers stay away!
+        String query = "DELETE FROM item WHERE id = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+            
+            // FIXED: Check if item exists first
+            if (Objects.isNull(loadItem(id))) {
+                return false; // Item doesn't exist
+            }
+            
+            stmt.setInt(1, id);
+            int res = stmt.executeUpdate();
+            
+            return res == 1;
+            
+        } catch (SQLException e) {
+            System.err.println("Error removing item: " + e.getMessage());
+        }
+        return false;
+    }
 
-	        if (res == 1) {
-	            ResultSet rs = stmt.getGeneratedKeys();
-	            if (rs.next()) {
-	                return rs.getInt(1);
-	            }
-	        }
-	    } catch (SQLException e) {
-	    	 e.printStackTrace();
-	    }
-	    return null;
-	}
+    @Override
+    public boolean updateItem(Item item) {
+        //  Used PreparedStatement instead of Statement to prevent SQL injection- got it online tbh
+        String query = "UPDATE item SET NAME = ?, PRICE = ?, TOTAL_NUMBER = ? WHERE ID = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+            
+            stmt.setString(1, item.getName());
+            stmt.setDouble(2, item.getPrice());
+            stmt.setInt(3, item.getTotalNumber());
+            stmt.setInt(4, item.getId());
+            
+            int res = stmt.executeUpdate();
+            return res == 1;
 
-	
-	@Override
-	public boolean removeItem(int id) {
-		try {
-			Connection connection =  dataSource.getConnection();
-			String query = "DELETE FROM item where id = " + id;
-			Statement statement = connection.createStatement();
-			int res = 0;
-			if (Objects.nonNull(loadItem(id))) {// nonNull   null
-				res = statement.executeUpdate(query);
-			}
-			
-			if(res == 1) {
-				return true;
-			}
-			
-			return false;
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-		}
-		return false;
-	}
+        } catch (SQLException e) {
+            System.err.println("Error updating item: " + e.getMessage());
+        }
+        return false;
+    }
+    
+    @Override
+    public List<ItemDetails> getAllItemDetails() {
+        return itemDAO.getAllItemDetails();
+    }
 
-	@Override
-	public boolean updateItem(Item item) {
-	    try {
-	        Connection connection = dataSource.getConnection();
+    @Override
+    public Item loadItem(int id) {
+        // Used PreparedStatement instead of Statement
+        String query = "SELECT * FROM item WHERE id = ?";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query)) {
+            
+            stmt.setInt(1, id);
+            try (ResultSet resultSet = stmt.executeQuery()) {
+                if (resultSet.next()) {
+                    return new Item(
+                        resultSet.getInt("id"),
+                        resultSet.getString("name"), // remmember this, i have changed "Name" to "name" for consistency
+                        resultSet.getDouble("price"),
+                        resultSet.getInt("total_number")
+                    );
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error loading item: " + e.getMessage());
+        }
+        return null;
+    }
+    
+    @Override
+    public List<Item> loadItems() {
+        // FIXED: Used try-with-resources and PreparedStatement
+        String query = "SELECT i.id, i.name, i.price, i.total_number, d.description " +
+                      "FROM item i LEFT JOIN item_details d ON i.id = d.item_id ORDER BY i.id";
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(query);
+             ResultSet resultSet = stmt.executeQuery()) {
 
-	        String query = "UPDATE item SET NAME = '" + item.getName() + "', " +
-	                       "PRICE = " + item.getPrice() + ", " +
-	                       "TOTAL_NUMBER = " + item.getTotalNumber() +
-	                       " WHERE ID = " + item.getId(); 
-	        Statement statement = connection.createStatement();
-	        int res = statement.executeUpdate(query);
-	        
-	        return res == 1;
+            List<Item> items = new ArrayList<>();
 
-	    } catch (SQLException e) {
-	        System.out.println("SQL Error: " + e.getMessage());
-	    }
+            while (resultSet.next()) {
+                Item item = new Item(
+                    resultSet.getInt("id"),
+                    resultSet.getString("name"),
+                    resultSet.getDouble("price"), 
+                    resultSet.getInt("total_number"),
+                    resultSet.getString("description") // May be null
+                );
+                items.add(item);
+            }
 
-	    return false;
-	}
-	
-	@Override
-	public List<ItemDetails> getAllItemDetails() {
-	    return itemDAO.getAllItemDetails();  // added this after the item data access object .java file    
-	}
+            return items;
 
-	@Override
-	public Item loadItem(int id) {
-		try {
-			Connection connection =  dataSource.getConnection();
-			String query = "SELECT * FROM item where id = " + id;
-			Statement statement = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery(query);
-			
-			
-			if (resultSet.next()) {
-				return new Item(
-						resultSet.getInt("id"),
-						resultSet.getString("Name"),
-						resultSet.getDouble("price"),
-						resultSet.getInt("total_number")
-				);
-			}
-			
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-		}
-		return null;
-	}
-	
-	@Override
-	public List<Item> loadItems() {
-	    try {
-	        Connection connection =  dataSource.getConnection();
-	        String query = "SELECT i.id, i.name, i.price, i.total_number, d.description " +
-	                       "FROM item i LEFT JOIN item_details d ON i.id = d.item_id ORDER BY i.id";
-	        Statement statement = connection.createStatement();
-	        ResultSet resultSet = statement.executeQuery(query);
-
-	        List<Item> items = new ArrayList<>();
-
-	        while (resultSet.next()) {
-	            Item item = new Item(
-	                resultSet.getInt("id"),
-	                resultSet.getString("name"),
-	                resultSet.getDouble("price"), 
-	                resultSet.getInt("total_number"), // as in table
-	                resultSet.getString("description") // may be null or .. empty
-	            );
-	            items.add(item);
-	        }
-
-	        return items;
-
-	    } catch (SQLException e) {
-	        System.out.println(e.getMessage());
-	    }
-	    return null;
-	}
-
+        } catch (SQLException e) {
+            System.err.println("Error loading items: " + e.getMessage());
+        }
+        return new ArrayList<>(); // FIXED: Return empty list instead of null
+    }
 }

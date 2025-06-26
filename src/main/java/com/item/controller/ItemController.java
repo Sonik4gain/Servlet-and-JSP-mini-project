@@ -89,11 +89,30 @@ public class ItemController extends HttpServlet {
         request.getRequestDispatcher("/update-item.jsp").forward(request, response);
     }
     
-    private void showItemDetails(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int id = Integer.parseInt(request.getParameter("id"));
-        Item item = itemService.loadItem(id);
-        request.setAttribute("item", item);
-        request.getRequestDispatcher("/show-item-details.jsp").forward(request, response);
+    private void showItemDetails(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        try {
+            int id = Integer.parseInt(request.getParameter("id"));
+            
+            // ENHANCED: Load item using the service layer
+            Item item = itemService.loadItem(id);
+            
+            if (item != null) {
+                // TASK 4: Only show details page if item exists
+                request.setAttribute("item", item);
+                request.getRequestDispatcher("/show-item-details.jsp").forward(request, response);
+            } else {
+                // ADDED: Better error handling - redirect to main page with error message
+                response.sendRedirect(request.getContextPath() + 
+                    "/ItemController?action=load-items&error=item_not_found");
+            }
+            
+        } catch (NumberFormatException e) {
+            // ADDED: Handle invalid ID parameter
+            System.err.println("Invalid item ID: " + e.getMessage());
+            response.sendRedirect(request.getContextPath() + 
+                "/ItemController?action=load-items&error=invalid_id");
+        }
     }
 
     private void updateItem(HttpServletRequest request, HttpServletResponse response) throws IOException {
