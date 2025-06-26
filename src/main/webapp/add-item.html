@@ -13,7 +13,7 @@
   <div class="text">
     Add Item
   </div>
-  <form action="/item-service-905/ItemController">
+  <form action="/item-service-905/ItemController" method="post">
     <div class="form-row">
       <div class="input-data">
         <input type="text" required name="itemName">
@@ -48,8 +48,8 @@
   </form>
 
   <p class="back">
-    <a href="" >Back To Items</a>
-  </p>
+    <a href="/item-service-905/ItemController?action=load-items">Back To Items</a>
+</p>
 </div>
 <!-- partial -->
 

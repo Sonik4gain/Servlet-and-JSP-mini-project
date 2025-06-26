@@ -141,17 +141,16 @@ public class ItemController extends HttpServlet {
 
     private void addItem(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Item item = extraxtItem(request);
-        Integer itemId = itemService.saveItemAndReturnId(item); // يتم حفظ المنتج هنا
-        
-        // تأكد من أن المنتج تم حفظه بنجاح
+        Integer itemId = itemService.saveItemAndReturnId(item);
+
         if (itemId != null) {
-            // بدلاً من التوجيه لإضافة التفاصيل، سنعود إلى القائمة الرئيسية
+            // FIXED: Redirect to load-items instead of showing blank page
             response.sendRedirect(request.getContextPath() + "/ItemController?action=load-items");
         } else {
-            // يمكنك هنا التعامل مع حالة فشل الحفظ، مثلاً إعادة التوجيه لصفحة خطأ
             response.getWriter().println("Error: Could not save the item.");
         }
     }
+
 
 	/*
 	 * private void addItem(HttpServletRequest request, HttpServletResponse
