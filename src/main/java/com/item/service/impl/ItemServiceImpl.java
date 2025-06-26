@@ -22,7 +22,7 @@ public class ItemServiceImpl implements ItemService {
     
     @Override
     public Integer saveItemAndReturnId(Item item) {
-        // Added try-with-resources for proper connection management
+        
         String query = "INSERT INTO item (NAME,PRICE,TOTAL_NUMBER) VALUES (?, ?, ?)";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
@@ -48,14 +48,14 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public boolean removeItem(int id) {
-        //  Used PreparedStatement instead of Statement to prevent SQL injection hackers stay away!
+        
         String query = "DELETE FROM item WHERE id = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
             
-            // FIXED: Check if item exists first
+            
             if (Objects.isNull(loadItem(id))) {
-                return false; // Item doesn't exist
+                return false; 
             }
             
             stmt.setInt(1, id);
@@ -71,7 +71,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public boolean updateItem(Item item) {
-        //  Used PreparedStatement instead of Statement to prevent SQL injection- got it online tbh
+       
         String query = "UPDATE item SET NAME = ?, PRICE = ?, TOTAL_NUMBER = ? WHERE ID = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -97,7 +97,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item loadItem(int id) {
-        // Used PreparedStatement instead of Statement
+        // Used PreparedStatement instead of Statement .. didnt know about that being a thing!
         String query = "SELECT * FROM item WHERE id = ?";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -121,7 +121,6 @@ public class ItemServiceImpl implements ItemService {
     
     @Override
     public List<Item> loadItems() {
-        // FIXED: Used try-with-resources and PreparedStatement
         String query = "SELECT i.id, i.name, i.price, i.total_number, d.description " +
                       "FROM item i LEFT JOIN item_details d ON i.id = d.item_id ORDER BY i.id";
         try (Connection connection = dataSource.getConnection();
@@ -146,6 +145,6 @@ public class ItemServiceImpl implements ItemService {
         } catch (SQLException e) {
             System.err.println("Error loading items: " + e.getMessage());
         }
-        return new ArrayList<>(); // FIXED: Return empty list instead of null
+        return new ArrayList<>(); 
     }
 }

@@ -19,8 +19,6 @@ import com.item.service.ItemService;
 import com.item.service.impl.ItemDetailsServiceImpl;
 import com.item.service.impl.ItemServiceImpl;
 
-
-
 //http://localhost:8080/item-service-905/ItemController                        action=null
 //http://localhost:8080/item-service-905/ItemController?action=srm              action=srm
 //http://localhost:8080/item-service-905/ItemController?action=load-items      action=load-items
@@ -94,21 +92,21 @@ public class ItemController extends HttpServlet {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             
-            // ENHANCED: Load item using the service layer
+            
             Item item = itemService.loadItem(id);
             
             if (item != null) {
-                // TASK 4: Only show details page if item exists
+                
                 request.setAttribute("item", item);
                 request.getRequestDispatcher("/show-item-details.jsp").forward(request, response);
             } else {
-                // ADDED: Better error handling - redirect to main page with error message
+                
                 response.sendRedirect(request.getContextPath() + 
                     "/ItemController?action=load-items&error=item_not_found");
             }
             
         } catch (NumberFormatException e) {
-            // ADDED: Handle invalid ID parameter
+          
             System.err.println("Invalid item ID: " + e.getMessage());
             response.sendRedirect(request.getContextPath() + 
                 "/ItemController?action=load-items&error=invalid_id");
@@ -137,7 +135,7 @@ public class ItemController extends HttpServlet {
         }
     }
     
- // ItemController.java
+ 
 
     private void addItem(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Item item = extraxtItem(request);

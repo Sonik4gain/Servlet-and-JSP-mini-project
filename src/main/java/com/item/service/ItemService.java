@@ -6,7 +6,7 @@ import com.item.model.Item;
 import com.item.model.ItemDetails;
 
 public interface ItemService {
-	// new value:
+	
 	Integer saveItemAndReturnId(Item item);
 
 	//boolean saveItem(Item item);

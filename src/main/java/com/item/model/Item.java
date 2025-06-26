@@ -5,7 +5,7 @@ public class Item {
     private String name;
     private double price;
     private int totalNumber;
-    private String description; // Added desc field!
+    private String description; 
 
     public Item(String name, double price, int totalNumber) {
         this.name = name;

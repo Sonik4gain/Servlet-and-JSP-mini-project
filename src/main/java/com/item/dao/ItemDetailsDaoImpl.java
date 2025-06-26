@@ -13,6 +13,7 @@ import java.util.List;
  * DAO implementation class that handles saving and retrieving ItemDetails from the database.
  * Uses JNDI to get the DataSource defined in context.xml (Tomcat).
  */
+// i have asked mr chat gpt to explain this code, so i liked the comments and decided to keep them for future me
 public class ItemDetailsDaoImpl implements ItemDetailsDao {
 
     private DataSource dataSource;

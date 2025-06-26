@@ -129,7 +129,6 @@
             </div>
         </div>
 
-        <!-- TASK 4: Display description only if the item has description -->
         <%
             if (item.getDescription() != null && !item.getDescription().trim().isEmpty()) {
         %>

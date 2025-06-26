@@ -152,6 +152,11 @@
 
     <div class="f">
         <a href="add-item.html">➕ Add New Item</a>
+        <!-- here I added logout button..  -->
+        <form method="post" action="LogoutServlet" style="display:inline;">
+        <input type="submit" class="button" value="🚪 Logout"
+               style="background-color: #f44336; border: none; padding: 10px 20px;
+               color: white; font-weight: bold; margin-left: 10px; border-radius: 5px;">
     </div>
 </div>
 </body>

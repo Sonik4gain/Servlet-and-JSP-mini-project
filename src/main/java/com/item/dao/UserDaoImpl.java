@@ -27,7 +27,7 @@ public class UserDaoImpl implements UserDao {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, user.getUsername());
-            stmt.setString(2, user.getPassword()); // Note: Password not hashed here yet just for testing 
+            stmt.setString(2, user.getPassword()); // Password not hashed here yet just for testing 
             return stmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
