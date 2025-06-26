@@ -26,12 +26,19 @@ public class ItemDetailsController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-
+        if (action == null) {
+            response.getWriter().println("Action is missing!");
+            return;
+        }
         switch (action) {
             case "show-add-form":
-                int itemId = Integer.parseInt(request.getParameter("itemId"));
-                request.setAttribute("itemId", itemId);
-                request.getRequestDispatcher("/add-item-details.jsp").forward(request, response);
+            	try {
+                    int itemId = Integer.parseInt(request.getParameter("itemId"));
+                    request.setAttribute("itemId", itemId);
+                    request.getRequestDispatcher("/add-item-details.jsp").forward(request, response);
+                } catch (NumberFormatException e) {
+                    response.getWriter().println("Invalid itemId!");
+                }
                 break;
 
             case "add-item-details":

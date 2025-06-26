@@ -1,5 +1,5 @@
 package com.item.service.impl;
-
+import java.sql.PreparedStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,25 +28,44 @@ public class ItemServiceImpl implements ItemService {
 	
 	
 
-	//preStat
-	@Override
-	public boolean saveItem(Item item) {
-		try {
-			Connection connection = dataSource.getConnection();
-			
-			String query = "INSERT INTO item (NAME,PRICE,TOTAL_NUMBER)"
-						+ " VALUES ('" + item.getName() + "', " 
-					    + item.getPrice() +", " + item.getTotalNumber() + ")";
-			Statement statement = connection.createStatement();
-			int res = statement.executeUpdate(query);
-			
-			System.out.println(res);
+	//preStat i will change this from boolean, to int maybe.. it was :public boolean saveItem(Item item){
+	/*
+	 * @Override public boolean saveItem(Item item) { try { Connection connection =
+	 * dataSource.getConnection();
+	 * 
+	 * String query = "INSERT INTO item (NAME,PRICE,TOTAL_NUMBER)" + " VALUES ('" +
+	 * item.getName() + "', " + item.getPrice() +", " + item.getTotalNumber() + ")";
+	 * Statement statement = connection.createStatement(); int res =
+	 * statement.executeUpdate(query);
+	 * 
+	 * System.out.println(res);
+	 * 
+	 * return res == 1; } catch (SQLException e) {
+	 * System.out.println(e.getMessage()); } return false; }
+	 */
+// new code : 
+	public Integer saveItemAndReturnId(Item item) {
+	    try {
+	        Connection connection = dataSource.getConnection();
 
-			return res == 1;
-		} catch (SQLException e) {
-			System.out.println(e.getMessage());
-		}
-		return false;
+	        String query = "INSERT INTO item (NAME,PRICE,TOTAL_NUMBER) VALUES (?, ?, ?)";
+	        PreparedStatement stmt = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+	        stmt.setString(1, item.getName());
+	        stmt.setDouble(2, item.getPrice());
+	        stmt.setInt(3, item.getTotalNumber());
+
+	        int res = stmt.executeUpdate();
+
+	        if (res == 1) {
+	            ResultSet rs = stmt.getGeneratedKeys();
+	            if (rs.next()) {
+	                return rs.getInt(1);
+	            }
+	        }
+	    } catch (SQLException e) {
+	    	 e.printStackTrace();
+	    }
+	    return null;
 	}
 
 	

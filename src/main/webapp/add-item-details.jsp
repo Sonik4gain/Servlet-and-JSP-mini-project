@@ -68,15 +68,21 @@
 <body>
 <div class="container">
     <h2>Add Description</h2>
+    
+
+     
     <form action="ItemDetailsController" method="get">
         <input type="hidden" name="action" value="add-item-details"/>
-        <input type="hidden" name="itemId" value="${itemId}"/>
+        <input type="hidden" name="itemId" value="<%= request.getAttribute("itemId") != null ? request.getAttribute("itemId") : "" %>" />
+
 
         <label for="description">Item Description:</label>
         <textarea name="description" rows="5" required></textarea>
 
         <input type="submit" value="Save Description"/>
-    </form>
+    </form> 
+    <p>Item ID: <%= request.getAttribute("itemId") %></p>
+    
     <a href="ItemController">← Back to Items List</a>
 </div>
 </body>
