@@ -13,7 +13,7 @@
 <!-- partial:index.partial.html -->
 <div class="container">
   <div class="text">
-    Add Item
+    Update Item
   </div>
   <form action="/item-service-905/ItemController">
     <div class="form-row">
@@ -42,8 +42,8 @@
   </form>
 
   <p class="back">
-    <a href="" >Back To Items</a>
-  </p>
+    <a href="/item-service-905/ItemController?action=load-items">Back To Items Page</a>
+</p>
 </div>
 <!-- partial -->
 
